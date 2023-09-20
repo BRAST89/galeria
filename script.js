@@ -1,34 +1,17 @@
 const imagenes = document.querySelectorAll(".imagen");
 const modal = document.getElementById("modal");
-const modalImagen = document.getElementById("modal-imagen");
+const modalContent = document.querySelector(".modal-content");
+const imagenModal = document.querySelector(".imagen-modal");
 const cerrarModal = document.getElementById("cerrar");
 let imagenActual = 0;
-let touchStartX = 0;
 
 function mostrarImagen(index) {
-    modalImagen.src = imagenes[index].querySelector("img").src;
-    imagenActual = index;
-}
-
-function handleTouchStart(event) {
-    touchStartX = event.touches[0].clientX;
-}
-
-function handleTouchEnd(event) {
-    const touchEndX = event.changedTouches[0].clientX;
-    const deltaX = touchEndX - touchStartX;
-
-    if (deltaX > 50 && modal.style.display === "block") {
-        // Deslizar hacia la derecha (anterior imagen)
-        if (imagenActual > 0) {
-            mostrarImagen(imagenActual - 1);
-        }
-    } else if (deltaX < -50 && modal.style.display === "block") {
-        // Deslizar hacia la izquierda (siguiente imagen)
-        if (imagenActual < imagenes.length - 1) {
-            mostrarImagen(imagenActual + 1);
-        }
-    }
+    imagenModal.style.opacity = 0;
+    setTimeout(() => {
+        imagenModal.style.backgroundImage = `url('${imagenes[index].style.backgroundImage.replace('url("', '').replace('")', '')}')`;
+        imagenModal.style.opacity = 1;
+        imagenActual = index;
+    }, 300);
 }
 
 imagenes.forEach((imagen, index) => {
@@ -48,12 +31,28 @@ modal.addEventListener("click", (e) => {
     }
 });
 
-modal.addEventListener("touchstart", handleTouchStart);
-modal.addEventListener("touchend", handleTouchEnd);
-// Inicializa Swiper
-const swiper = new Swiper('.swiper-container', {
-    navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-    },
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.style.display === "block") {
+        modal.style.display = "none";
+    } else if (e.key === "ArrowLeft" && modal.style.display === "block") {
+        if (imagenActual > 0) {
+            mostrarImagen(imagenActual - 1);
+        }
+    } else if (e.key === "ArrowRight" && modal.style.display === "block") {
+        if (imagenActual < imagenes.length - 1) {
+            mostrarImagen(imagenActual + 1);
+        }
+    }
 });
+
+function mostrarImagen(index) {
+    console.log("Mostrar imagen llamado con índice " + index);
+    imagenModal.style.opacity = 0;
+    setTimeout(() => {
+        const imgUrl = `url('${imagenes[index].style.backgroundImage.replace('url("', '').replace('")', '')}')`;
+        console.log("URL de la imagen: " + imgUrl);
+        imagenModal.style.backgroundImage = imgUrl;
+        imagenModal.style.opacity = 1;
+        imagenActual = index;
+    }, 300);
+}
